@@ -1,0 +1,224 @@
+{
+  "name": "webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "id": "5269119d-0588-42a3-8962-eee63b054121",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        320
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "snYhxvIw7OZGSwTG",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "10775d34-b6e8-495f-bea2-6ac130017630",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1j3rTz2d1MInkOLrK91Vp5LS09tm7kE93-QbCMXLWZU0",
+          "mode": "list",
+          "cachedResultName": "Contact Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j3rTz2d1MInkOLrK91Vp5LS09tm7kE93-QbCMXLWZU0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1j3rTz2d1MInkOLrK91Vp5LS09tm7kE93-QbCMXLWZU0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "71b90dad-bfd5-4475-8a26-7c334e270418",
+      "name": "contactData",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        128,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"emailAddress\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b04a9d9b-6690-448b-8c13-3672e98bf40d",
+      "name": "sendEmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        304
+      ],
+      "webhookId": "0cd83f42-b3d7-4819-89d5-36038b54f9c1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hKrJDAcH8tN6Wd8l",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "n8n",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "80d520a5-3f94-4dc6-89e2-57738e92ad25",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        80
+      ],
+      "webhookId": "44fd9c8a-250a-4c05-9035-91bf6f85d015"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Email for: {{ $json.body.to }}\nEmail content: {{ $json.body.emailContent }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an AI agent responsible for drafting and sending professional emails based on user instructions. You have access to two tools: `contactData` to find email addresses and `sendEmail` to compose and send emails. Your objective is to identify the recipient's contact information, draft a professional email, and sign off as \"karnVen\" before sending.\n\n---\n\n## Tools  \n- **contactData**: Retrieves the recipient's email address based on their name.  \n  **Input**: Name (e.g., \"John Doe\").  \n  **Output**: Email address (e.g., \"johndoe@example.com\").  \n\n- **sendEmail**: Sends an email with a subject and body.  \n  **Input**:  \n  - `recipient`: Email address (e.g., \"johndoe@example.com\").  \n  - `subject`: Email subject (e.g., \"Meeting Request\").  \n  - `body`: Email body (e.g., \"Hi John, meeting is set for Tuesday.\").  "
+        }
+      },
+      "id": "c43c6708-ed19-44f5-809a-021eb20a9ff3",
+      "name": "Email Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        16,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        16,
+        320
+      ],
+      "id": "62308386-82ce-4459-a042-7442141a1263",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "contactData": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sendEmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e1b7a4c-970b-413d-9a0d-11817221b07b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "YqnWo4HyzdyY5aTz",
+  "tags": []
+}

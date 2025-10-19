@@ -1,0 +1,235 @@
+{
+  "name": "firecrawl6",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5f1db45e-6062-4e35-9d79-52a92c98b8ef",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef9efb29-cd8c-4933-bacb-77377b456447",
+              "name": "search term",
+              "value": "anthropic latest development ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d4edceac-f9fc-4203-bd01-2ed629cea387",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/extract",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": [\n    \"https://quotes.toscrape.com/\"\n  ],\n  \"prompt\": \"extract all the quotes and authors from this website\",\n  \"schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"quotes\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"quote\": {\n              \"type\": \"string\"\n            },\n            \"author\": {\n              \"type\": \"string\"\n            }\n          },\n          \"required\": [\n            \"quote\",\n            \"author\"\n          ]\n        }\n      }\n    },\n    \"required\": [\n      \"quotes\"\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "98d693ad-624c-41d6-9eeb-2c6f658dc6fc",
+      "name": "extract",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zOlSnwlHjCWIaQOP",
+          "name": "firecrowl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.firecrawl.dev/v1/extract/{{ $(\"extract\").item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "a58ea7f1-a69b-460a-829a-c440d63b771a",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zOlSnwlHjCWIaQOP",
+          "name": "firecrowl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "95cae18d-88ae-4770-afc9-d3ff4c53e6eb",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        16
+      ],
+      "id": "da9ebead-e831-4e37-b00e-f8765a417663",
+      "name": "If",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        16
+      ],
+      "id": "3f6774b3-b571-467d-a598-456773be8abb",
+      "name": "Wait",
+      "webhookId": "c2b2b2ab-5132-4212-bdbd-3eae14691159",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        208
+      ],
+      "id": "ec69ce00-0e62-4cfa-9e33-3f2c28f57678",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6a1e178e-d3c5-453d-9b41-a2bbed2e2cff",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "jzv7yOI7Al2DslCv",
+  "tags": []
+}

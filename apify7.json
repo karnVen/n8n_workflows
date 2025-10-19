@@ -1,0 +1,142 @@
+{
+  "name": "apify7",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e8e66a55-02a6-40d5-bda8-877b27a307b1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "509f1930-e595-49ba-b6b9-32190883cfa6",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        96
+      ],
+      "id": "ff0b23df-506d-4ee7-8b5f-969723463344",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        32
+      ],
+      "id": "30a562bd-c3f5-4d59-8ec5-97cbc5e56e36",
+      "name": "Wait",
+      "webhookId": "79631d14-5bc2-4f6d-96d3-1bb883a41d90"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/clockworks~tiktok-scraper/runs?token=apify_api_yUe5GLaDyelQt2rfAp1tyMZb7lejeh3vbQK7",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"excludePinnedPosts\": false,\n    \"hashtags\": [\n        \"ai\"\n    ],\n    \"proxyCountryCode\": \"None\",\n    \"resultsPerPage\": 10,\n    \"scrapeRelatedVideos\": false,\n    \"shouldDownloadAvatars\": false,\n    \"shouldDownloadCovers\": false,\n    \"shouldDownloadMusicCovers\": false,\n    \"shouldDownloadSlideshowImages\": false,\n    \"shouldDownloadSubtitles\": false,\n    \"shouldDownloadVideos\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c4c61fc2-109b-4f40-b8eb-c80a1052350f",
+      "name": "start node"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/clockworks~tiktok-scraper/runs/last/dataset/items?token=apify_api_yUe5GLaDyelQt2rfAp1tyMZb7lejeh3vbQK7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        48
+      ],
+      "id": "05ad01d5-8ec5-4ff3-b2e2-86c54eb8e19f",
+      "name": "grab result"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "start node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "grab result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start node": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "grab result": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d07071ab-d8c1-4e8a-9968-03cff68d886e",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "RmqTySYMdCJ1Bayc",
+  "tags": []
+}

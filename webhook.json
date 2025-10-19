@@ -1,0 +1,137 @@
+{
+  "name": "webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0e80e6c0-cde2-4314-a073-8a38a856332f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        176
+      ],
+      "id": "bc378ef7-abc3-4c14-b5f0-bb7689a3e3d7",
+      "name": "Webhook",
+      "webhookId": "0e80e6c0-cde2-4314-a073-8a38a856332f"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=the problem: {{ $json.body.problem }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an AI Excuse Generator. Your job is to create clever, creative, and context-appropriate excuses that someone could use to avoid or get out of a situation.\n\n## Instructions\n1) You will receive a problem as well as a tone for the excuse.\n2) Possible tones include:\n- Realistic: Believable and reasonable\n- Funny: Lighthearted and humorous\n- Ridiculous: Over-the-top and clearly fake, but entertaining\n- Outrageous: Wild and dramatic, pushing the limits of believability\n3) Your excuse should be 1–3 sentences long and match the selected tone.\n\n## Output\n- Only return the excuse\n- Add a touch of humor to the excuses.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        96,
+        176
+      ],
+      "id": "d171fc41-4b4c-4b22-b3b4-85d90dbd3346",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        400
+      ],
+      "id": "ff1987f9-f49f-4d0a-9590-e0058b212b68",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "r41hJObhC9WmjVKr",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        176
+      ],
+      "id": "d75639a3-31cd-458d-8b5b-af9ab22d2f19",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "# 🛠 **Setup Guide**\n\n## 👨‍💻 [**Nate Herk**](https://www.youtube.com/@nateherk)\n\n1️⃣ **OpenAI Credential**  \nSet up your OpenAI credentials (or connect a different chat model if preferred).\n\n2️⃣ **Webhook URL**  \nCopy the webhook URL:  \nUse the **Test URL** for testing workflows  \nUse the **Production URL** for live workflows  \nThen, paste it into Lovable so it knows where to send data.\n\n3️⃣ **Respond to Lovable**  \nMake sure your workflow includes a **\"Respond to Webhook\"** node so Lovable can receive the data back.\n\n✅ That’s it! You’re ready to build magic.\n",
+        "height": 480,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        96
+      ],
+      "id": "ce67b67b-8e9d-49bf-a32e-f28e9981e810",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8ee588ba-e622-49f8-aad0-4a2cb79459be",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "YatNwEDMcpfFXM34",
+  "tags": []
+}

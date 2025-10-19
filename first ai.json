@@ -1,0 +1,265 @@
+{
+  "name": "first ai",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -32
+      ],
+      "id": "fb079af3-d92d-463b-bcda-23dd458623a3",
+      "name": "When chat message received",
+      "webhookId": "c7a32397-e936-40fe-b429-df01c2b401aa"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=subject: {{ $json.Subject }}\nbody : {{ $json.snippet }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant\n\nYou must always look in the contacts database before doing something like creating an event or sending an email. You need the person's email address in order to do one of those actions.\n\nHere is the current date/time: {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "456cc320-7057-4b77-b39d-6a7ebf7a1980",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        208
+      ],
+      "id": "d8ab7165-da1a-4233-a9ae-c3a419863754",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.From }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        208
+      ],
+      "id": "66d21952-0560-478b-b029-72b400bfa280",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        208
+      ],
+      "id": "cbdcc9df-1f4a-4568-a7af-14ac4ac39d66",
+      "name": "Send a message in Gmail",
+      "webhookId": "50bf726b-7c83-4169-a533-7a5563733683",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hKrJDAcH8tN6Wd8l",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA",
+          "mode": "list",
+          "cachedResultName": "contact",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        560,
+        176
+      ],
+      "id": "3fde9eb0-7de3-4675-88a1-76f48b74b020",
+      "name": "contact",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "onemonth06@gmail.com",
+          "mode": "list",
+          "cachedResultName": "onemonth06@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        304
+      ],
+      "id": "4cba2c6b-fc70-407e-997a-77a1e3f7c88f",
+      "name": "calender",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "721hPQYyCyJvPhoi",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        160
+      ],
+      "id": "2e5d1fb8-b360-48a8-a45b-adaf82d99efb",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1Tozk6K0461PZG0t",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contact": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calender": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "abc3901d-2aa1-4242-b9e2-b077e863baf7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "FkthKVRO0PIpMqhi",
+  "tags": []
+}

@@ -1,0 +1,171 @@
+{
+  "name": "multi agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "8e655f75-cca8-4736-b468-f5e1d99f5556",
+      "name": "When chat message received",
+      "webhookId": "c6729681-5272-4ace-9e9c-dcba78ec29db"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Overview\n\nYou are an orchestrator agent. Your only job is to delegate the task to the correct tool. No need to write emails or create summaries.\n\n#go through sheets tools first for gmail contacts"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        16
+      ],
+      "id": "3c729b8e-c88e-418d-9a4a-9d840485f0b3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        384
+      ],
+      "id": "7408e86d-73ec-4b02-9f79-bef49e91de04",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "use this tool for any gmail action",
+        "workflowId": {
+          "__rl": true,
+          "value": "OIhoUKBjYgTm0SMx",
+          "mode": "list",
+          "cachedResultName": "sub agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        208
+      ],
+      "id": "8a60303e-01f8-4a24-963f-68ef1b66276d",
+      "name": "gmail"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA",
+          "mode": "list",
+          "cachedResultName": "contact",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gH25yzs4emld4HuNPr_ydS0MLlN2DDROggv1nYifDcA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        496,
+        272
+      ],
+      "id": "7f6eb642-ac80-4cbd-bff4-52319c4eaa91",
+      "name": "sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "28290579-c6f8-4fc6-a072-784c04dfa4e9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "zV8G0eYiDW3kmfO2",
+  "tags": []
+}

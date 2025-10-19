@@ -1,0 +1,355 @@
+{
+  "name": "postgress",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        288
+      ],
+      "id": "56ae8d75-e5a4-46da-97d5-9bd3fbe406f4",
+      "name": "When chat message received",
+      "webhookId": "679e356b-fcc3-4abc-ab59-8ca4ce2cc616"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        512
+      ],
+      "id": "e50a9be5-b78a-4210-820a-6f72b1a8085e",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        512
+      ],
+      "id": "7f303c0b-a22b-4881-a058-603a5a9839f9",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "tableName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        320,
+        512
+      ],
+      "id": "c6573e01-fa54-4597-ac3a-70fa0274c9e7",
+      "name": "Supabase Vector Store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        1152
+      ],
+      "id": "766e5f52-8f3e-4b91-b92c-04ea4dfc28c6",
+      "name": "Embeddings OpenAI"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        400,
+        1152
+      ],
+      "id": "cfaf07a9-4859-4f06-96fe-dddb47ae8351",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        512,
+        1360
+      ],
+      "id": "53dfd27a-aa6c-46e7-950f-ec426a47626d",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        928
+      ],
+      "id": "e22a027a-dd42-4ab3-97df-46da74c582b0",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        272,
+        928
+      ],
+      "id": "97a292d0-e62a-4b67-b24b-58ac41451a73",
+      "name": "Add to Supabase"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        48,
+        928
+      ],
+      "id": "1f359843-d214-4c5b-af97-eb6e8f54d36a",
+      "name": "Download File"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        192,
+        288
+      ],
+      "id": "6300d1db-0743-4af3-b56c-4d0d50ede744",
+      "name": "RAG Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        672
+      ],
+      "id": "dd2a1b11-2a51-4586-b6a2-0dfe14df19fc",
+      "name": "Embeddings"
+    },
+    {
+      "parameters": {
+        "content": "# Loading Binary Data from Google Drive",
+        "height": 760,
+        "width": 1140
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "30b2dda1-b8f6-43d3-9436-227f68304060",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# RAG Agent with Memory\n",
+        "height": 660,
+        "width": 1140,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "0bf5b9df-6ad0-4fb6-bd83-b5c3dd94cef4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Nate Herk | AI Automation",
+        "height": 100,
+        "width": 500,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "38df2155-0320-4f93-aca0-582e37ff772b",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Add to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "72546d82-a42f-4f9a-8e68-f269e90fb9dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65316866b8cb0da7a22b79bb52ef25b5d0949e32bad740d477203fe32cf2da5a"
+  },
+  "id": "9OWIkh5YnlfXCtaf",
+  "tags": []
+}

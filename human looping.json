@@ -1,0 +1,828 @@
+{
+  "name": "human looping",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -672,
+        -1056
+      ],
+      "id": "aa1b43ff-b8ef-416c-869b-4b5863f31282",
+      "name": "Telegram Trigger",
+      "webhookId": "f9d2a169-fd6e-40f1-82f5-36afa714030d",
+      "credentials": {
+        "telegramApi": {
+          "id": "UzkcjqUnqGX3pGAr",
+          "name": "Telegram account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the web. ",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"query\": \"{searchTerm}\",\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": []\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user is searching for. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -784
+      ],
+      "id": "5792d068-b455-49b1-acca-832615322446",
+      "name": "Tavily",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XXYgDZSRLYQWKvdI",
+          "name": "tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "message": "=Good to go?\n\n{{ $json.output }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        -1056
+      ],
+      "id": "709e557d-20d6-4e3b-a6c7-097ae0712b24",
+      "name": "Submit Approval",
+      "webhookId": "da32f9b9-1b07-4e0f-9b5a-55a8c9ab9d59",
+      "credentials": {
+        "telegramApi": {
+          "id": "4FRvJ3apEkoLCHHq",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "938f9bd1-c97f-4aff-a17c-b5e83f83d639",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -1056
+      ],
+      "id": "315513b3-5529-4518-b921-12d227226231",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('X_Post Agent').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -1152
+      ],
+      "id": "3bf9614c-dd22-41c3-a247-73c29086a25e",
+      "name": "X"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -704,
+        -384
+      ],
+      "id": "58aa5cc5-117b-4cf4-8a01-e93aafe88ae4",
+      "name": "Telegram_Trigger",
+      "webhookId": "f9d2a169-fd6e-40f1-82f5-36afa714030d",
+      "credentials": {
+        "telegramApi": {
+          "id": "UzkcjqUnqGX3pGAr",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.data.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "approved",
+              "description": "=The post has been reviewed and accepted as-is. The human explicitly or implicitly expresses approval, indicating that no changes are needed. \n\nExample phrases include:\n\n\"Looks good.\"\n\"Go ahead and send it.\"\n\"This works for me.\"\n\"Approved.\"\n\"No changes needed.\"\n"
+            },
+            {
+              "category": "declined",
+              "description": "=The post has been reviewed, but the human requests modifications before it is sent like tweaks, removing parts, rewording, etc. This could include suggested edits, rewording, or major revisions. \n\nExample phrases include:\n\n\"Can we tweak this part?\"\n\"make it shorter\"\n\"change the source to 'American Kennel Club'\"\n\"more emojis\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -384
+      ],
+      "id": "872b471c-2cbe-4a73-b640-978f05d9588c",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the post to revise: {{ $('Set Post').item.json.post }}\n\nHere is the human feedback: {{ $json.data.text }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an expert twitter writer. Your job is to take an incoming post and revise it based on the feedback the human submitted.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        624,
+        -240
+      ],
+      "id": "9525b16e-a978-44ac-acb0-7d45e585b65b",
+      "name": "Revision Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454eb351-9781-48c2-b279-d5341210a1a1",
+              "name": "post",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        -384
+      ],
+      "id": "4710248d-859b-46ae-9da5-62e422cc3261",
+      "name": "Set Post"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the web. ",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"query\": \"{searchTerm}\",\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": []\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user is searching for. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        48
+      ],
+      "id": "1cf92f21-9bda-49be-b3af-ae1469248f51",
+      "name": "Tavily Search",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XXYgDZSRLYQWKvdI",
+          "name": "tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=# Overview  \nYou are an AI agent responsible for creating Twitter (X) posts based on user requests.  \n\n## Instructions  \n1. Always use the Tavily Search tool to find accurate, current information about the topic.  \n2. Write an informative, engaging tweet (up to 280 characters).  \n3. Include a brief reference to the source (e.g., \"via TechCrunch\", \"according to The Verge\") directly in the tweet.  \n4. Do not output anything except the final tweet.  \n\n## Tool\n- Tavily Search: Use this for real-time web search. Must be used every time before creating the post.\n\n## Example\n1) Input: \"Create a tweet about NASA’s latest discovery.\"  \n2) Action: Search the web using Tavily Search.\n3) Output: \"NASA just found signs of ancient riverbeds on Mars—suggesting the Red Planet may have once been home to life. Huge leap in space exploration 🌌 (via NASA) #Mars #SpaceNews\"  \n\n## Final Notes  \n- Avoid clickbait or speculation—stick to factual and sourced content.  \n- Use hashtags or emojis only to enhance visibility.  \n- Keep language friendly, concise, and informative.  \n- Never use an \"@\" symbol when referencing the source.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -528,
+        -384
+      ],
+      "id": "eca05591-f5fc-459c-9a21-42a06c403556",
+      "name": "X Post Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=# Overview  \nYou are an AI agent responsible for creating Twitter (X) posts based on user requests.  \n\n## Instructions  \n1. Always use the Tavily tool to find accurate, current information about the topic.  \n2. Write an informative, engaging tweet (up to 280 characters).  \n3. Include a brief reference to the source (e.g., \"via TechCrunch\", \"according to The Verge\") directly in the tweet.  \n4. Do not output anything except the final tweet.  \n\n## Tool\n- Tavily: Use this for real-time web search. Must be used every time before creating the post.\n\n## Example\n1) Input: \"Create a tweet about NASA’s latest discovery.\"  \n2) Action: Search the web using Tavily.\n3) Output: \"NASA just found signs of ancient riverbeds on Mars—suggesting the Red Planet may have once been home to life. Huge leap in space exploration 🌌 (via NASA) #Mars #SpaceNews\"  \n\n## Final Notes  \n- Avoid clickbait or speculation—stick to factual and sourced content.  \n- Use hashtags or emojis only when relevant to enhance visibility.  \n- Keep language friendly, concise, and informative.  \n- Never use an \"@\" symbol when referencing the source.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -496,
+        -1056
+      ],
+      "id": "2b2a1d93-b602-4be7-bb3d-104faa26f684",
+      "name": "X_Post Agent"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Set Post').item.json.post }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -496
+      ],
+      "id": "69ef7224-79f0-44cd-b6d6-f26ed1e594c8",
+      "name": "X Post"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Post was denied. Please submit another request.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -960
+      ],
+      "id": "0b263244-5439-4c84-b3e2-34a1df8d3278",
+      "name": "Denial message",
+      "webhookId": "09d73d82-d0bf-416b-98bc-fc9a5c1b0c13",
+      "credentials": {
+        "telegramApi": {
+          "id": "UzkcjqUnqGX3pGAr",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Human in the Loop 2.0 (Text Based Feedback)\n\n",
+        "height": 820,
+        "width": 1760,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        -592
+      ],
+      "id": "4ec25f61-eb72-42e1-a143-ab42cd901982",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# HITL",
+        "height": 260,
+        "width": 180,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -464
+      ],
+      "id": "2cd24807-070f-4322-87ea-c17a4b3dd4ec",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Set",
+        "height": 260,
+        "width": 180,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -464
+      ],
+      "id": "99e5d175-b1d7-47b6-a993-3182a678c469",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Decision Point",
+        "height": 260,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -464
+      ],
+      "id": "a14c68c3-7015-4360-86dc-1d5093e8d1d4",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Post\n",
+        "height": 220,
+        "width": 220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -560
+      ],
+      "id": "b4f36769-b7b4-4832-a2ac-e110abfb5f56",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Revision\n",
+        "height": 220,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -320
+      ],
+      "id": "b69461f6-0052-42d5-ac66-b6cbe2ea7919",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Initial Content\n",
+        "height": 260,
+        "width": 520,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -464
+      ],
+      "id": "17604be0-4d75-4d6b-a1e7-2eff5f92651b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Web Search\n",
+        "height": 220,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -32
+      ],
+      "id": "88005a83-e03e-4b57-a9bf-c177bcccabb7",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Chat Models\n\n",
+        "height": 220,
+        "width": 440,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        -32
+      ],
+      "id": "0cdd2aaa-68e1-42ca-a3d4-6ed57a0897e5",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Human in the Loop (Yes/No)",
+        "height": 620,
+        "width": 1340,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        -1264
+      ],
+      "id": "6c674c64-943b-4d6f-9366-0d051edc9f8a",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Initial Content\n",
+        "height": 260,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -1136
+      ],
+      "id": "5c28e005-4bef-4bdd-b9af-8a291678bb54",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# HITL",
+        "height": 260,
+        "width": 180,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -1136
+      ],
+      "id": "3738b8fb-0aed-40a9-adee-abf88b753684",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# Decision Point",
+        "height": 460,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -1216
+      ],
+      "id": "7ad56a8c-6339-4640-a3a0-5e3de465fa3d",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "# Web Search\n",
+        "height": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -864
+      ],
+      "id": "15073dba-8fa0-49a5-a010-c8d0a959f4c9",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "# Chat Model\n\n",
+        "height": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -864
+      ],
+      "id": "bbb3cb2a-9bfe-4a73-aff6-10fe7823cf71",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "# ⚙️ Setup Guide  \n**Author:** [Nate Herk](https://www.youtube.com/@nateherk)\n\nFollow these steps to get started:\n\n1. **Connect your Telegram account**  \n   Make sure your Telegram credentials are properly configured in your N8N instance.\n\n2. **Plug in your [Tavily](https://tavily.com/) API key**  \n   You'll need this to enable search and research functionality within your workflow.\n\n3. **Plug in your [OpenRouter](https://openrouter.ai/) credentials**  \n   This allows your AI nodes to route requests through OpenRouter's model gateway.\n\nOnce all three are connected, your workflow should be ready to run!\n",
+        "height": 440,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        -1296
+      ],
+      "id": "4eca79f6-b3e2-41ab-9a60-d7271c725f44",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -800
+      ],
+      "id": "642fa419-58f1-4410-8c80-eee0bdbcc2aa",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        48
+      ],
+      "id": "fde0d67b-3a68-4e44-b169-2ded04acd040",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        48
+      ],
+      "id": "3bae96cb-afea-4bfe-b138-8e951d5308ce",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "X_Post Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "X_Post Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Approval": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "X",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Denial message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram_Trigger": {
+      "main": [
+        [
+          {
+            "node": "X Post Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "X Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Agent": {
+      "main": [
+        [
+          {
+            "node": "Set Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Post": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Search": {
+      "ai_tool": [
+        [
+          {
+            "node": "X Post Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X Post Agent": {
+      "main": [
+        [
+          {
+            "node": "Set Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X_Post Agent": {
+      "main": [
+        [
+          {
+            "node": "Submit Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "X_Post Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "X Post Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Revision Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c0f65a9e-b3ae-4059-96b3-67dda5dfaa67",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "OJ69qgzHkTm2Poat",
+  "tags": []
+}

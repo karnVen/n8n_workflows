@@ -1,0 +1,413 @@
+{
+  "name": "Gitpost",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "627523b7-99fe-4999-88cd-7605c47db00b",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        -32
+      ],
+      "id": "e82aa0f1-e329-4f31-87cc-96c07767215e",
+      "name": "Webhook",
+      "webhookId": "627523b7-99fe-4999-88cd-7605c47db00b"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $json.body.repository.owner.login }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $json.body.repository.name }}",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        -192
+      ],
+      "id": "d869adce-05e8-48e4-ad82-e0c2ad1e8bfc",
+      "name": "List files",
+      "webhookId": "833277db-4f26-4182-b91d-bdba4a7776f5",
+      "credentials": {
+        "githubApi": {
+          "id": "hxS1IMnwOzfImkRK",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.repository.owner.login }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.repository.name }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('List files').item.json.path }}",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -192
+      ],
+      "id": "5c28eb4d-e16f-4383-9f83-ce2ee413d071",
+      "name": "Get a file",
+      "webhookId": "83925b1f-15d4-4a66-8a40-648a77b1c2e3",
+      "credentials": {
+        "githubApi": {
+          "id": "hxS1IMnwOzfImkRK",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  if (item.json.content) {\n    item.json.text = global.Buffer.from(item.json.content, 'base64').toString('utf8');\n  } else {\n    item.json.text = 'No content found';\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        160
+      ],
+      "id": "9da89f7c-e0ff-4e0d-ac36-6a91a49a48b6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.combinedText}}",
+        "options": {
+          "systemMessage": "=You are an expert AI assistant specialized in web technologies. When the user provides a code snippet or script:\n\nAnalyze the code to understand what functionality or feature it implements and what problem it addresses.\n\nIdentify the broader web development topic or concept the code relates to (e.g., responsive design, user authentication, API integration, frontend frameworks).\n\nWrite a clear, insightful, and engaging post about that web topic, its importance, use cases, and best practices.\n\nFocus on explaining the real-world application or concept behind the code rather than detailing the code itself.\n\nAvoid step-by-step code explanations unless specifically requested.\n\nFormat the post for easy reading with headings, bullet points, and examples where relevant.\n\nAlways aim to educate and inform readers about the web development context and why the code matters in practice."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "2b969026-6c2f-4d48-8242-5b1e67d3cbc5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=You are an expert AI assistant tasked with converting code descriptions into LinkedIn posts. Generate a post that is no longer than 2500 characters, including spaces and punctuation.\n\nInstructions:\n\nWrite an engaging, clear, and professional LinkedIn post that summarizes the code’s purpose and value.\n\nUse LinkedIn’s tone: impactful, concise, and reader-friendly.\n\nUse paragraphs and line breaks to enhance readability within the character limit.\n\nThe output must never exceed 2500 characters.\n\nIf the content is shorter than 2500 characters, that is acceptable.\n\nIf the content exceeds 2500 characters, immediately shorten and revise the post until it fits within the limit without losing crucial meaning.\n\nDo NOT mention character count or generate any text outside the LinkedIn post content.\n\nVerify and ensure the final output is at or below 2500 characters before returning it.\n\nOutput only the LinkedIn post text—no explanations, disclaimers, or extra notes."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        -112
+      ],
+      "id": "0a6ba60b-68f3-4c61-9c7b-5db1dd354695",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "person": "D_TD09Ah3x",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -112
+      ],
+      "id": "e7192dbc-2415-4592-a421-1f15f9e22b42",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "IuXAOuVvCP5br96G",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access all input items (each with json.text)\nconst allTexts = $input.all().map(item => item.json.text);\n\n// Combine them into one string, separated by line breaks (or your preferred separator)\nconst combinedText = allTexts.join('\\n\\n'); // two newlines for clarity\n\n// Return a single item with combined text suitable for AI prompt\nreturn [\n  {\n    json: {\n      combinedText: combinedText,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        160
+      ],
+      "id": "cfe25f99-1f14-41b3-9d37-11786d4432e1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "content": "## GitHub operations 🔧🐙💻\n",
+        "height": 224,
+        "width": 448,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "5837b5c1-1988-47d3-823d-f61b814b12ca",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Code Extraction: 🔍 & Code Merge: 🔀\n",
+        "height": 240,
+        "width": 464,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "d8c31db6-6052-40dc-aa11-a1ecf618dc13",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Github Webhook\n\n",
+        "height": 224,
+        "width": 272,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "74a18c9a-2836-45c5-8f78-40b794631ce0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        64
+      ],
+      "id": "f8e275fc-a433-4ba5-97b9-c0a9e993f7af",
+      "name": "Gemini 2.5 flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vh6igAt4FmBKJgV8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        64
+      ],
+      "id": "70e67779-5e4e-45b5-9e3c-e618a4014b10",
+      "name": "Gemini 2.5 flash1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vh6igAt4FmBKJgV8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI agent for deep analysis of code 🧠🔍",
+        "height": 592,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "d1c8c043-afb3-4ba6-ab16-87304ca53718",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## AI agent for creating LinkedIn posts 🤖📝🔗\n",
+        "height": 592,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "eb2380b2-d88f-40b2-9a44-0264323fdff5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## LinkedIn\n",
+        "height": 256,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "87bd2e6e-7f80-45ab-8e6f-d441e9dca35c",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "List files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List files": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.5 flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.5 flash1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f8395e3-09f2-47a1-9e22-b469943adbbc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dbf5b17bd9738c47ec0a710eb5f7fab7a7881b72ad82153178076c09c0da41a3"
+  },
+  "id": "iFKIyQoE3u4P8uVd",
+  "tags": []
+}

@@ -1,0 +1,128 @@
+{
+  "name": "Content Creator Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"api_key\": \"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\",\n    \"query\": \"{searchTerm}\",\n    \"search_depth\": \"basic\",\n    \"include_answer\": true,\n    \"topic\": \"news\",\n    \"include_raw_content\": true,\n    \"max_results\": 3\n} ",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to write a blog about",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        176
+      ],
+      "id": "7e95c078-d582-4956-a8ca-91c437167eff",
+      "name": "Tavily1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query}}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are a skilled AI blog writer specializing in engaging, well-structured, and informative content. Your writing style is clear, compelling, and tailored to the target audience. You optimize for readability, SEO, and value, ensuring blogs are well-researched, original, and free of fluff.\n\n## Tools\nTavily - Use this to search the web about the requested topic for the blog post.\n\n## Blog Requirements\nFormat all blog content in HTML, using proper headings (<h1>, <h2>), paragraphs (<p>), bullet points (<ul><li>), and links (<a href=\"URL\">) for citations. All citations from the Tavily tool must be preserved, with clickable hyperlinks so readers can access the original sources.\n\nMaintain a natural, human-like tone, use varied sentence structures, and include relevant examples or data when needed. Structure content for easy reading with concise paragraphs and logical flow. Always ensure factual accuracy and align the tone with the intended brand or purpose.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "2e6411f0-dfa2-40f3-a499-053aca84a3ac",
+      "name": "Content Creator Agent1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        160
+      ],
+      "id": "cc4afc5c-68c9-4351-b754-863a65f95ad7",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        -48
+      ],
+      "id": "d9fcd0c8-4075-4c57-a948-67d3078f6c68",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tavily1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Creator Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Creator Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Content Creator Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a05e4d2-90d4-4cfd-a832-7a30b742bf87",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "PYmIqRUhF4X8qnwF",
+  "tags": []
+}

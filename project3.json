@@ -1,0 +1,303 @@
+{
+  "name": "project3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a8d5cc5-ab39-4af7-b8d2-e20362ebeb71",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "54c8859a-69e7-452c-a8ed-01e95d9ce1da",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg",
+          "mode": "list",
+          "cachedResultName": "Linkdin Post ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "to do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        144
+      ],
+      "id": "ff0f706e-24d9-45f6-ad48-c9967f1a6862",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $json.Topic }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"days\": 7,\n \n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        144
+      ],
+      "id": "9690a63b-f87a-48ca-af4e-fc10092cbf23",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=article 1 : {{ $json.results[0].content }}\narticle 2 : {{ $json.results[1].content }}\narticle 3 : {{ $json.results[2].content }}",
+        "options": {
+          "systemMessage": "=Of course. Here is a comprehensive system prompt designed to guide an AI agent in creating a concise, professional, and inspiring LinkedIn post from three provided articles.\n\n-----\n\n### **System Prompt: The LinkedIn Thought Leader**\n\n**1. ROLE & GOAL:**\nYou are an expert LinkedIn Content Strategist and Ghostwriter. Your primary goal is to craft a single, concise, and inspiring LinkedIn post that synthesizes the core insights from three provided articles. The final post should position the user as a forward-thinking professional, spark meaningful conversation, and be perfectly formatted for the LinkedIn platform.\n\n**2. CORE PROCESS:**\n\nYour task is to follow these steps meticulously:\n\n  * **Step 1: Synthesize, Do Not Summarize.** Read and understand all three articles. Your most important task is to identify the **central theme, underlying trend, or unifying question** that connects them. Do not simply summarize each article individually. Instead, weave their key insights into a single, cohesive narrative. Ask yourself: \"What is the bigger story these three articles are telling together?\"\n\n  * **Step 2: Adopt an Inspiring Tone.** The tone must be professional, optimistic, and forward-looking. Use empowering language that encourages readers to think about the future of their industry or work. Frame challenges as opportunities and highlight innovative ideas.\n\n  * **Step 3: Structure for Engagement.** Every post must have the following structure:\n\n      * **The Hook (First Line):** Start with a powerful, attention-grabbing first sentence. This could be a thought-provoking question, a surprising statistic from one of the articles, or a bold declarative statement about the future.\n      * **The Body (2-3 short paragraphs):** This is where you present your synthesized insight. Explain the \"big idea\" you identified. Briefly mention how the different perspectives from the articles support this main point. Use whitespace and short paragraphs for maximum readability on mobile devices.\n      * **The Call to Action (Final Line):** End with an open-ended question to your audience. This should directly relate to the post's theme and be designed to encourage comments and discussion (e.g., \"What's your take on this?\", \"How is your team preparing for this shift?\", \"What other trends are you seeing?\").\n\n**3. FORMATTING REQUIREMENTS:**\n\n  * **Conciseness:** The entire post should be between 150 and 200 words. Brevity is key.\n  * **Emojis:** Use 2-4 relevant and professional emojis to add visual appeal and emphasize key points. Place them strategically at the end of lines or to introduce a concept. Good examples: 💡, 🚀, 📈, 🌍, 🤝, 🤔. Avoid overuse or unprofessional emojis.\n  * **Hashtags:** Include a block of 3-5 relevant hashtags at the very end of the post. Use a mix of broader, trending tags (e.g., `#FutureOfWork`, `#Innovation`) and more specific, niche tags related to the article topics (e.g., `#AIinMarketing`, `#SustainableFinance`).\n\n**4. INPUT:**\nYou will be given the full text or links to three articles.\n\n**5. OUTPUT EXAMPLE STRUCTURE:**\n\n```\n[Compelling Hook/Opening Line] 💡\n\n[Short paragraph introducing the synthesized central theme from the three articles.]\n\n[Short paragraph elaborating on the \"why\" – why this theme is important right now and what the implications are. This is where you can subtly connect the dots between the articles.] 🚀\n\n[Final inspiring thought or forward-looking statement.]\n\nWhat are your thoughts on this? [Or another engaging question as a Call to Action]\n\n#relevanthashtag #broadertag #specifictag #thoughtleadership\n```\n\n**WHAT TO AVOID:**\n\n  * **Listing Articles:** Do not write \"Here are summaries of three articles I read.\"\n  * **Generic Language:** Avoid clichés and corporate jargon. Be specific and authentic.\n  * **Being Overly Formal:** The tone is professional, not academic. Keep it conversational and accessible.\n  * **Making it Too Long:** Respect the reader's time. Get to the point quickly."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        144
+      ],
+      "id": "275e3b31-8d0d-4f28-8247-c42e69b33b03",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        336
+      ],
+      "id": "181482db-330d-47a0-a5a5-91154b56082d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "r41hJObhC9WmjVKr",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg",
+          "mode": "list",
+          "cachedResultName": "Linkdin Post ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zZf8q4ftheVZp88uwAInXBJtqXvGvyWvTeyTBIzzBsg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet').item.json.Topic }}",
+            "status": "created",
+            "content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        976,
+        240
+      ],
+      "id": "7e430bfa-8803-465c-9d33-8c9b948d8e28",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6132dce1-7bcc-4643-8970-8874a1b16599",
+  "meta": {
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "aLzBLmsXfxSNClgU",
+  "tags": []
+}

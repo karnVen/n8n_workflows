@@ -1,0 +1,215 @@
+{
+  "name": "Error logger",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        752,
+        208
+      ],
+      "id": "1752effa-1401-4d3a-9821-8aadb0addd30",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1pqsIwwXktJ7uVHKAr29NAuqpEvEWMFgQRFN4tUIwJy4",
+          "mode": "list",
+          "cachedResultName": "Error Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pqsIwwXktJ7uVHKAr29NAuqpEvEWMFgQRFN4tUIwJy4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pqsIwwXktJ7uVHKAr29NAuqpEvEWMFgQRFN4tUIwJy4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "Workflow": "={{ $json.workflow.name }}",
+            "URL": "={{ $json.execution.url }}",
+            "Node": "={{ $json.execution.error.node.name }}",
+            "Error Message": "={{ $json.execution.error.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1088,
+        64
+      ],
+      "id": "456a3521-3508-46df-9670-eb10d5bec60a",
+      "name": "Log Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nz6GZTwK395sxaVu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08L6NKQBEW",
+          "mode": "list",
+          "cachedResultName": "all-awesome-ai-stuff"
+        },
+        "text": "=Workflow Error: {{ $json.workflow.name }}\n\n{{ $json.execution.error.node.name }} errored at {{ $now.format('yyyy-MM-dd hh:mma') }}.\n\nThe error message was: {{ $json.execution.error.message }}\n\nSee this execution here: {{ $json.execution.url }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        384
+      ],
+      "id": "992cde9d-ec12-4955-971a-68784e0bb37a",
+      "name": "Notification",
+      "webhookId": "f7ea0908-8d52-4f41-863f-b2befd4991f8",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "0UA8oBBTh18TA4HQ",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Error Logger",
+        "height": 580,
+        "width": 740,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "19537b96-567c-4d5f-ab13-bd92044e80f3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# 🛠️ Setup Guide  \n**Author:** [Nate Herk](https://www.youtube.com/@nateherk)\n\n---\n### 1️⃣ Link This as Your Error Workflow  \n- Go to **Settings** → **Error Workflow** → Select this workflow as your global error handler.\n- The parent workflow must be active.\n---\n\n#### 2️⃣ Error Logger (Google Sheets)  \n🔗 **[Make a copy of the template](https://docs.google.com/spreadsheets/d/1Aiz1cpv1k6Qlmp1Cjmj0ZtNuG6fC_cG24O_XaiP8NOs/edit?usp=sharing)**  \n- Set up your Google Sheets credentials  \n- Connect your Google credential  \n- Customize the sheet as needed (optional)\n---\n\n#### 3️⃣ Slack Notifications (Optional)  \n- Connect your Slack credential in the Slack node  \n- Choose a channel or user to send error alerts to\n",
+        "height": 580,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13e7512e-7a1a-4bad-a72f-246f9c814b06",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "45b34b51-e44c-4135-ba94-58d0a9f11259",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "any",
+    "errorWorkflow": "Y0F1qRTz9UddwaSg"
+  },
+  "versionId": "8e4eee96-d484-42cf-bf49-a9be8a4196d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "Y0F1qRTz9UddwaSg",
+  "tags": []
+}

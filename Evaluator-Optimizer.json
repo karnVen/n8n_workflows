@@ -1,0 +1,383 @@
+{
+  "name": "Evaluator-Optimizer",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Evaluator-Optimizer\n✅ Ensures High-Quality Outputs – AI doesn’t just generate code, it verifies and refines until all requirements are met.\n\n✅ Reduces Errors & Manual Review – Automates verification, minimizing the need for human debugging.\n\n✅ Flexible & Scalable – Can be adapted to content generation, structured data validation, and UI text refinement.\n\n✅ Optimized AI Performance – The iterative approach ensures continuous improvement of AI-generated responses.",
+        "height": 220,
+        "width": 820,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1168,
+        -640
+      ],
+      "typeVersion": 1,
+      "id": "b005a866-2f27-4b4c-8262-b5d0ab512817",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1280,
+        -304
+      ],
+      "id": "1bf196b1-1c95-4872-8154-8618bfd5211b",
+      "name": "When chat message received",
+      "webhookId": "fab30ad7-8a5a-4477-be98-1aa43b92b052"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        64
+      ],
+      "id": "cab57633-5078-429b-b14f-94fd19f5322f",
+      "name": "4o mini"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# Overview\nYou are an expert biography writer. You will receive information about a person, and your job is to create an entire profile using the information they give you. You are allowed to be creative."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1056,
+        -304
+      ],
+      "id": "e73fa3b4-e24d-4072-ba50-5cb054d34f33",
+      "name": "Biography Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the biography:\n{{ $json.bio }}",
+        "options": {
+          "systemMessage": "=## Overview\nYou are an expert biography evaluator. Your job is to provide feedback on the biography.\n\n## Criteria\n- Make sure the biography includes a quote from the person. This could be their favorite saying or a piece of advice. It is essential that every biography has a quote.\n- Make sure the biography is light and humorous.\n- Make sure the biography has NO emojis.\n\n## Output\nYou only need to output feedback. If the biography is finished and all the criteria are met, simply output \"Finished\"."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -480,
+        -304
+      ],
+      "id": "2edcb891-e1e7-4cfc-b3fd-888427d908b5",
+      "name": "Evaluator Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d931f3d-b391-4be9-a50a-cc4a73c31b71",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "Finished",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        -304
+      ],
+      "id": "b3bca75c-0cd7-4af4-b15b-88e5295ca1ed",
+      "name": "Evaluate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Biography: {{ $('Set Bio').item.json.bio }}\n\nFeedback: {{ $('Evaluator Agent').item.json.output }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an expert biography revisor. Your job is to take the biography and optimize it based on the feedback."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        208,
+        -224
+      ],
+      "id": "f350701c-b8d2-40b9-b602-0a4c8604d3b8",
+      "name": "Optimizer Agent"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1TcbXAorxWbls8C_OVwwF_5nQYXoqsZkAuEeMHm4VGnk/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Set Bio').item.json.bio }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -448
+      ],
+      "id": "8369d8c2-f89b-4a89-8400-a1383b704062",
+      "name": "Push to Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "RkXSVJh9uoCIghBC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adf17d4d-a89e-4f97-9d31-5e74834428fc",
+              "name": "bio",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -304
+      ],
+      "id": "593563c4-a867-4527-81a8-365c0c8eeaae",
+      "name": "Set Bio"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-reasoner",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        48
+      ],
+      "id": "5ac49532-55bb-4609-b622-c9c9ae1a4cb0",
+      "name": "DeepSeek R1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -96
+      ],
+      "id": "46229bcd-e174-475d-a6d9-7d3ae69bd630",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -96
+      ],
+      "id": "3ad4501e-8c1e-4b5f-b949-2187a4f75480",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -16
+      ],
+      "id": "b04588c9-2ee4-4b1d-85d1-5f39a5e304ed",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Biography Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4o mini": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Biography Agent": {
+      "main": [
+        [
+          {
+            "node": "Set Bio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluator Agent": {
+      "main": [
+        [
+          {
+            "node": "Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Push to Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Optimizer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimizer Agent": {
+      "main": [
+        [
+          {
+            "node": "Set Bio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Bio": {
+      "main": [
+        [
+          {
+            "node": "Evaluator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Biography Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Evaluator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Optimizer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7a5d6249-2980-4b08-bdcf-7ffa7b9f0e0f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "5fuPMYv0LrP2eg5f",
+  "tags": []
+}

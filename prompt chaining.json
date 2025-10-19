@@ -1,0 +1,315 @@
+{
+  "name": "prompt chaining",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the topic to write a blog about: {{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "# Overview\nYou are an expert outline writer. Your job is to generate a structured outline for a blog post with section titles and key points."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        480,
+        -160
+      ],
+      "id": "040b8149-6090-42c5-8d2b-6ef4d9cdb899",
+      "name": "Outline Writer"
+    },
+    {
+      "parameters": {
+        "content": "# Prompt Chaining\n ✅ Improved Accuracy and Quality – Each step focuses on a specific task, reducing errors and hallucinations.\n\n ✅ Greater Control Over Each Step – You can refine or tweak individual steps without affecting the entire process.\n\n ✅ Specialization Leads to More Effective AI Agents – Each AI agent becomes a specialist rather than a generalist, improving reliability.\n\n ✅ Easier Debugging and Optimization – If an output isn’t ideal, you only need to fix the weak link rather than redoing everything.\n\n ✅ More Scalable and Reusable Workflows – A structured, step-by-step workflow can be repurposed for different use cases.\n",
+        "height": 260,
+        "width": 940,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        -544
+      ],
+      "typeVersion": 1,
+      "id": "ab4402ab-239a-4071-a3fb-cbf1924bce81",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the outline: \n\n{{ $json.output }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an expert blog evaluator. Revise this outline and ensure it covers the following key criteria: \n(1) Engaging Introduction \n(2) Clear Section Breakdown\n(3) Logical Flow\n(4) Conclusion with Key Takeaways\n\n## Output\nOnly output the revised outline."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        800,
+        -160
+      ],
+      "id": "8d3ff4fd-9779-49a3-8257-8f83a1bc3e3d",
+      "name": "Outline Evaluation"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here if the revised outline: {{ $json.output }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an expert blog writer. Generate a detailed blog post using the outline with well-structured paragraphs and engaging content."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1136,
+        -160
+      ],
+      "id": "dd50187e-771a-4a82-9368-36519fdc6d09",
+      "name": "Blog Writer"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1O6KhF--Wfb5vmAGxWGGMYcq0gMbYy6u8FnBjSkclfdY/edit?tab=t.0",
+        "simple": false,
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        -160
+      ],
+      "id": "6dfd9f1b-dfcb-4f7c-baf6-acd211036249",
+      "name": "Post to Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "RkXSVJh9uoCIghBC",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        112
+      ],
+      "id": "dc5894b4-57ee-4759-9338-a7f318345b73",
+      "name": "DeepSeek R1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "IWocOx056dYl5YHZ",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -160
+      ],
+      "id": "cce026c1-bb38-4edd-8143-1bc96dba4394",
+      "name": "When chat message received",
+      "webhookId": "8b5d17e6-9356-437e-a97a-4f4027e6451d"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        112
+      ],
+      "id": "b1abcd9e-4eed-4b6b-8f51-e797a442a434",
+      "name": "2.0 Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        112
+      ],
+      "id": "7a6ebf9e-56be-46be-ad53-fb7d46ad2452",
+      "name": "Claude 3.5"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        832,
+        96
+      ],
+      "id": "259a3cc9-33eb-4ea9-96f3-d17677b30a10",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        80
+      ],
+      "id": "bf35b95b-1759-4fed-9f32-77c84a05e0e5",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VFL3jvTrRGxEIe7S",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Outline Evaluation": [
+      {
+        "json": {
+          "output": "### **Option 1: Gun Safety & Responsible Ownership**\n\n**Title:** The Non-Negotiables of Gun Safety: A Guide for Responsible Owners\n\n**1. Introduction: The Responsibility in Your Hands**\n*   **Hook:** Start with a powerful statement about the profound responsibility that comes with firearm ownership. Frame safety not as a suggestion, but as an absolute requirement.\n*   **The \"Why\":** Briefly state that responsible ownership protects the owner, their family, and their community.\n*   **Roadmap:** Clearly outline the four pillars of firearm safety that will be covered: Secure Storage, Safe Handling, Diligent Maintenance, and Continuous Education.\n\n**2. Pillar 1: Secure Storage - The First Line of Defense**\n*   **Core Principle:** Explain that a firearm's safety begins when it's not in use. The goal is preventing unauthorized access—period.\n*   **Storage Solutions Breakdown:**\n    *   **Good:** Cable/Trigger Locks (Basic prevention)\n    *   **Better:** Lockboxes & Small Safes (Quick access & security)\n    *   **Best:** Full-Size Gun Safes (Highest security for multiple firearms)\n*   **Actionable Advice:** Provide a quick guide on choosing the right option based on home environment (e.g., presence of children), budget, and need for quick access.\n\n**3. Pillar 2: Safe Handling - The Four Universal Rules**\n*   **Introduction:** Present these not as rules, but as unbreakable habits.\n*   **The Rules (Clearly Stated):**\n    *   **Rule 1:** Treat all guns as if they are always loaded.\n    *   **Rule 2:** Never let the muzzle cover anything you are not willing to destroy.\n    *   **Rule 3:** Keep your finger off the trigger until your sights are on the target and you have made the decision to shoot.\n    *   **Rule 4:** Be sure of your target and what is beyond it.\n*   **Practical Application:** Briefly explain how these rules apply in common scenarios like at the range, at home, and during cleaning.\n\n**4. Pillar 3: Diligent Maintenance - A Clean Gun is a Safe Gun**\n*   **The \"Why\":** Explain how neglect leads to malfunctions, which can be dangerous.\n*   **The \"What\":** List essential cleaning supplies (cleaning rod, brushes, solvent, lubricant).\n*   **The \"How\":** Outline the basic, universal steps of safely unloading, disassembling (as per manufacturer), cleaning, and reassembling a firearm. Emphasize doing this in a distraction-free area.\n\n**5. Pillar 4: Continuous Education - Your Skills Are Perishable**\n*   **Beyond the Basics:** Stress that ownership is a journey of learning.\n*   **Finding Quality Training:**\n    *   The importance of certified instructors (e.g., NRA, USCCA).\n    *   Types of courses to consider: Basic handgun safety, concealed carry, defensive shooting.\n*   **Legal Knowledge:** Emphasize the owner's responsibility to know and comply with all local, state, and federal laws, which change over time.\n\n**6. Conclusion: Your Commitment to Safety**\n*   **Key Takeaway 1:** Responsible gun ownership is an active, ongoing commitment, not a one-time event.\n*   **Key Takeaway 2:** The four pillars—Storage, Handling, Maintenance, and Education—are interconnected and equally critical.\n*   **Call to Action:** Encourage readers to create a personal \"Firearm Safety Plan\" for their home and to schedule their next training or practice session. Provide links to reputable safety organizations.\n\n---\n\n### **Option 2: The History of Firearms**\n\n**Title:** From Hand Cannon to High-Tech: The Evolution of the Firearm\n\n**1. Introduction: More Than a Machine**\n*   **Hook:** Open with the idea that the history of the firearm is a story of human ingenuity, conflict, and societal change, stretching back over centuries.\n*   **Thesis:** This post will trace the major technological leaps that transformed firearms from volatile tubes of black powder into the reliable, precise tools of today.\n*   **Roadmap:** Preview the journey through three distinct eras: The Age of Black Powder, The Cartridge Revolution, and The Modern Era.\n\n**2. Era 1: The Age of Black Powder & Muzzle-Loaders (c. 1300-1850)**\n*   **The Spark:** The invention of gunpowder and the first \"hand cannons.\"\n*   **The Matchlock & Wheellock:** Explain the earliest ignition systems and their limitations (slow, unreliable, weather-dependent).\n*   **The Flintlock:** Detail this major innovation that made firearms more practical for individuals and armies, defining an era of warfare and exploration.\n\n**3. Era 2: The Cartridge Revolution (c. 1850-1900)**\n*   **The Game-Changer:** Explain the invention of the self-contained cartridge (bullet, powder, and primer in one unit) and how it changed everything.\n*   **Rise of the Repeater:** Discuss how the cartridge enabled the development of repeating firearms.\n    *   **The Revolver:** Samuel Colt and the impact on personal defense and westward expansion.\n    *   **The Lever-Action Rifle:** The \"gun that won the West\" and its role in military and civilian life.\n*   **The Bolt-Action:** The emergence of a stronger, more accurate military rifle that would dominate the battlefields of the early 20th century.\n\n**4. Era 3: The Modern Era (c. 1900-Present)**\n*   **Smokeless Powder & Self-Loaders:** Explain the shift to more powerful propellants that enabled the creation of semi-automatic and automatic firearms.\n*   **Iconic Designs:** Briefly touch on the designs that defined the 20th century (e.g., M1911 pistol, M1 Garand, AK-47, AR-15) and the design principles behind them.\n*   **The Age of Polymers and Optics:** Discuss the modern shift toward lighter materials, modularity, and the routine use of advanced optics.\n\n**5. Conclusion: The Unwavering Trajectory**\n*   **Key Takeaway 1:** The evolution of firearms has been a constant quest for three things: reliability, rate of fire, and accuracy.\n*   **Key Takeaway 2:** Each major technological leap not only changed how firearms worked but also had a profound impact on warfare, law, and society itself.\n*   **Forward-Looking Statement:** Conclude by reflecting on how this centuries-long trajectory of innovation continues today with smart technology and new materials.\n\n---\n\n### **Option 3: The Gun Debate**\n\n**Title:** Understanding the Gun Debate: A Guide to the Core Arguments\n\n**1. Introduction: Navigating a Divided Landscape**\n*   **Hook:** Acknowledge that the gun debate is one of the most polarizing topics in modern society, often generating more heat than light.\n*   **Stated Goal:** Clarify that this post is not about taking a side, but about providing a neutral, factual framework. The goal is to equip the reader to understand the fundamental pillars of the conversation.\n*   **Roadmap:** Introduce the three pillars that form the foundation of the debate: The Legal Framework (Second Amendment), The Push for Regulation (Gun Control), and The Sociocultural Context (Gun Culture).\n\n**2. Pillar 1: The Legal Framework - The Second Amendment**\n*   **The Text:** State the exact text of the amendment: \"A well regulated Militia, being necessary to the security of a free State, the right of the people to keep and bear Arms, shall not be infringed.\"\n*   **The Core Interpretive Conflict:**\n    *   **Collective Right:** The view that the amendment protects the right of states to maintain a militia.\n    *   **Individual Right:** The view that the amendment protects an individual's right to own firearms for lawful purposes, including self-defense.\n*   **Landmark Rulings:** Briefly explain the significance of key Supreme Court cases like *D.C. v. Heller* (2008), which affirmed an individual's right to own a firearm for self-defense at home, while also stating the right is not unlimited.\n\n**3. Pillar 2: The Push for Regulation - The Spectrum of \"Gun Control\"**\n*   **Clarification:** Explain that \"gun control\" isn't one policy, but a broad range of proposals.\n*   **Arguments FOR Stricter Regulation (The Public Safety Argument):**\n    *   Core Goal: Reducing gun violence, mass shootings, and accidental deaths.\n    *   Common Proposals: Universal background checks, \"red flag\" laws, bans on certain types of firearms, magazine capacity limits.\n*   **Arguments AGAINST Stricter Regulation (The Self-Defense Argument):**\n    *   Core Goal: Protecting the constitutional right to self-defense and ensuring law-abiding citizens are not disarmed.\n    *   Common Rebuttals: Such laws don't deter criminals, they only penalize lawful owners; the best defense against a \"bad guy with a gun\" is a \"good guy with a gun.\"\n\n**4. Pillar 3: The Sociocultural Context - America's \"Gun Culture\"**\n*   **Not a Monolith:** Explain that there isn't one single \"gun culture,\" but many.\n*   **Spectrum of Motivations for Ownership:**\n    *   **Sport & Hobby:** Hunters, competitive shooters, collectors.\n    *   **Self-Defense:** Individuals concerned with personal and family protection.\n    *   **Constitutional/Political:** Citizens who view firearm ownership as a check on potential government overreach.\n*   **The Cultural Divide:** Briefly touch on how geography (rural vs. urban) and personal experience often shape an individual's perception of firearms.\n\n**5. Conclusion: Key Takeaways for a More Informed Conversation**\n*   **Key Takeaway 1:** The debate is fundamentally a clash of deeply held values: individual liberty versus collective safety. Most people want a safe society; they disagree on how to achieve it.\n*   **Key Takeaway 2:** The language matters. Understanding the difference between a \"semi-automatic\" and \"automatic\" firearm, or what the Second Amendment actually says, is crucial for productive dialogue.\n*   **Call for Critical Thinking:** End by encouraging the reader to listen for the underlying values in arguments on both sides and to seek out primary sources rather than relying on charged rhetoric. The goal is understanding, not just winning an argument."
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Outline Writer": {
+      "main": [
+        [
+          {
+            "node": "Outline Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outline Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Blog Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Writer": {
+      "main": [
+        [
+          {
+            "node": "Post to Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Outline Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.0 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Outline Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude 3.5": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Outline Evaluation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek R1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Blog Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f49f8779-1649-4c47-98b8-c0f38823012c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00bc05ac56bf1690730d0511d2e3faeae316912814f173ade8d59b179643e399"
+  },
+  "id": "p0oUbuD1RFsAXTRU",
+  "tags": []
+}
